@@ -16,6 +16,10 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "resolveJsonModule": true, // Ajout pour supporter les fichiers JSON
+    "esModuleInterop": true // Ajout pour une meilleure compatibilité avec les modules
+  },
+  "include": ["src/**/*", "src/config/*.json"], // Inclure les fichiers JSON dans le build
+  "exclude": ["node_modules"] // Exclure les fichiers non pertinents
 }
