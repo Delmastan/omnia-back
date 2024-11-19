@@ -9,16 +9,21 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { db } from './firebase/firebase';
+import { collectionList } from './config/collectionList';
+import { FirestoreDataService } from './firebase/firestoreDataService';
 
-@Controller('test')
+@Controller(collectionList.TEST)
 export class AppController {
+  constructor(private readonly firebaseDataService: FirestoreDataService) {}
+
   // CREATE: Ajouter un document dans la collection
   @Post()
   async createDocument(@Body() data: any) {
     try {
-      const docRef = await db.collection('test').add(data);
-      return { id: docRef.id, message: 'Document created successfully' };
+      const docPath = `${collectionList.TEST}/${data.id}`;
+      await this.firebaseDataService.postDocToFirestore(docPath, data);
+
+      return { message: 'Document created successfully' };
     } catch (error) {
       throw new HttpException(
         'Failed to create document',
@@ -31,8 +36,10 @@ export class AppController {
   @Get()
   async getAllDocuments() {
     try {
-      const snapshot = await db.collection('test').get();
-      const result = snapshot.docs.map((doc) => ({
+      const tests = await this.firebaseDataService.getCollectionGroup(
+        collectionList.TEST,
+      );
+      const result = tests.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
@@ -49,14 +56,15 @@ export class AppController {
   @Get(':id')
   async getDocumentById(@Param('id') id: string) {
     try {
-      const docRef = db.collection('test').doc(id);
-      const doc = await docRef.get();
+      const docPath = `${collectionList.TEST}/${id}`;
+      const response =
+        await this.firebaseDataService.getDocFromFirestore(docPath);
 
-      if (!doc.exists) {
+      if (!response?.exists) {
         throw new HttpException('Document not found', HttpStatus.NOT_FOUND);
       }
 
-      return { id: doc.id, ...doc.data() };
+      return { id: response.id, ...response.data() };
     } catch (error) {
       throw new HttpException(
         'Failed to fetch document',
@@ -69,14 +77,14 @@ export class AppController {
   @Put(':id')
   async updateDocument(@Param('id') id: string, @Body() data: any) {
     try {
-      const docRef = db.collection('test').doc(id);
-      const doc = await docRef.get();
+      const docPath = `${collectionList.TEST}/${id}`;
+      const doc = await this.firebaseDataService.getDocFromFirestore(docPath);
 
-      if (!doc.exists) {
+      if (!doc?.exists) {
         throw new HttpException('Document not found', HttpStatus.NOT_FOUND);
       }
 
-      await docRef.update(data);
+      await this.firebaseDataService.updateDocToFirestore(docPath, data);
       return { message: 'Document updated successfully' };
     } catch (error) {
       throw new HttpException(
@@ -90,14 +98,14 @@ export class AppController {
   @Delete(':id')
   async deleteDocument(@Param('id') id: string) {
     try {
-      const docRef = db.collection('test').doc(id);
-      const doc = await docRef.get();
+      const docPath = `${collectionList.TEST}/${id}`;
+      const doc = await this.firebaseDataService.getDocFromFirestore(docPath);
 
-      if (!doc.exists) {
+      if (!doc?.exists) {
         throw new HttpException('Document not found', HttpStatus.NOT_FOUND);
       }
 
-      await docRef.delete();
+      await this.firebaseDataService.deleteDocToFirestore(docPath);
       return { message: 'Document deleted successfully' };
     } catch (error) {
       throw new HttpException(
