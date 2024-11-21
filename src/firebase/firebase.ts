@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 
-const serviceAccount = require('../config/omnia-api-8b243-firebase-adminsdk-35inn-ccdecb39f2.json');
+const serviceAccount = require('../config/firebase_key.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

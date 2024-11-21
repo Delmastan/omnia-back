@@ -30,9 +30,9 @@ export class ClassesController {
   }
 
   // READ: Récupérer un document spécifique par ID
-  @Get(':id')
-  async getDocumentById(@Param('id') id: string) {
-    const result = await this.classesService.getClassById(id);
+  @Get(':ref')
+  async getDocumentByRef(@Param('ref') ref: string) {
+    const result = await this.classesService.getClassByRef(ref);
     return result;
   }
 
@@ -44,9 +44,9 @@ export class ClassesController {
   //   }
 
   // DELETE: Supprimer un document par ID
-  @Delete(':id')
-  async deleteDocument(@Param('id') id: string) {
-    const result = await this.classesService.deleteClass(id);
+  @Delete(':ref')
+  async deleteDocument(@Param('ref') ref: string) {
+    const result = await this.classesService.deleteClass(ref);
     return result;
   }
 }

@@ -1,4 +1,10 @@
-import { IsString, IsObject, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsArray,
+  IsObject,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 // Définir les classes auxiliaires avant de les utiliser
@@ -18,7 +24,7 @@ export class Description {
   en: string;
 }
 
-export class ClassesModel {
+export class SubclassesModel {
   @IsString()
   ref: string;
 
@@ -34,4 +40,9 @@ export class ClassesModel {
 
   @IsString()
   image: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  evolve?: string[];
 }

@@ -14,8 +14,8 @@ export class ClassesService {
     return result;
   }
 
-  async getClassById(id: string) {
-    const response = await this.testRef.doc(id).get();
+  async getClassByRef(ref: string) {
+    const response = await this.testRef.doc(ref).get();
     if (!response.exists) {
       throw new Error('Document not found');
     }
@@ -23,8 +23,21 @@ export class ClassesService {
   }
 
   async createClass(data: ClassesModel) {
-    const response = await this.testRef.add(data);
-    return { id: response.id, message: 'Document created successfully' };
+    const docRef = this.testRef.doc(data.ref);
+    const doc = await docRef.get();
+
+    let setData = data;
+
+    if (doc.exists) {
+      const existingData = doc.data() as ClassesModel;
+      setData = { ...existingData, ...data };
+    }
+    await docRef.set(setData);
+
+    return {
+      id: data.name,
+      message: 'Document created successfully with custom ID',
+    };
   }
 
   //   async updateClass(id: string, data: ClassesModel) {
