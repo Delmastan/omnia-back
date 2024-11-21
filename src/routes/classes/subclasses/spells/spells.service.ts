@@ -1,17 +1,18 @@
 import { db } from 'src/firebase/firebase';
-import { SubclassesModel } from './subclassesModels';
+import { SpellsModel } from './spellsModels';
 import { collectionList } from 'src/config/collectionList';
+import { getSubclassesPath } from '../subclasses.service';
 
-export const getSubclassesPath = (classRef: string) =>
-    `${collectionList.CLASSES}/${classRef}/${collectionList.SUBCLASSES}`;
+export const getSpellsPath = (classRef: string, subclassRef: string) =>
+    `${getSubclassesPath(classRef)}/${subclassRef}/${collectionList.SPELLS}`;
 
-export class SubclassesService {
-    getCollectionRef(classRef: string) {
-        return db.collection(getSubclassesPath(classRef));
+export class SpellsService {
+    getCollectionRef(classRef: string, subclassRef: string) {
+        return db.collection(getSpellsPath(classRef, subclassRef));
     }
 
-    async getAllSubclasses(classRef: string) {
-        const testRef = this.getCollectionRef(classRef);
+    async getAllSpells(classRef: string, subclassRef: string) {
+        const testRef = this.getCollectionRef(classRef, subclassRef);
         const response = await testRef.get();
         const result = response.docs.map((doc) => ({
             id: doc.id,
@@ -20,8 +21,8 @@ export class SubclassesService {
         return result;
     }
 
-    async getSubclassByRef(classRef: string, ref: string) {
-        const testRef = this.getCollectionRef(classRef);
+    async getSpellByRef(classRef: string, subclassRef: string, ref: string) {
+        const testRef = this.getCollectionRef(classRef, subclassRef);
         const response = await testRef.doc(ref).get();
         if (!response.exists) {
             throw new Error('Document not found');
@@ -29,15 +30,15 @@ export class SubclassesService {
         return { id: response.id, ...response.data() };
     }
 
-    async createSubclass(classRef: string, data: SubclassesModel) {
-        const testRef = this.getCollectionRef(classRef);
+    async createSpell(classRef: string, subclassRef: string, data: SpellsModel) {
+        const testRef = this.getCollectionRef(classRef, subclassRef);
         const docRef = testRef.doc(data.ref);
         const doc = await docRef.get();
 
         let setData = data;
 
         if (doc.exists) {
-            const existingData = doc.data() as SubclassesModel;
+            const existingData = doc.data() as SpellsModel;
             setData = { ...existingData, ...data };
         }
         await docRef.set(setData);
@@ -48,8 +49,8 @@ export class SubclassesService {
         };
     }
 
-    async deleteSubclass(classRef: string, ref: string) {
-        const testRef = this.getCollectionRef(classRef);
+    async deleteSpell(classRef: string, subclassRef: string, ref: string) {
+        const testRef = this.getCollectionRef(classRef, subclassRef);
         const docRef = testRef.doc(ref);
         const doc = await docRef.get();
         if (!doc.exists) {
@@ -61,5 +62,5 @@ export class SubclassesService {
     }
 }
 
-const subclassesService = new SubclassesService();
-export default subclassesService;
+const spellsService = new SpellsService();
+export default spellsService;

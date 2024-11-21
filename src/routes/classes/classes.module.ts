@@ -4,9 +4,9 @@ import { ClassesService } from './classes.service';
 import { SubclassesModule } from './subclasses/subclasses.module';
 
 @Module({
-  imports: [SubclassesModule],
-  controllers: [ClassesController],
-  providers: [ClassesService],
-  exports: [ClassesService],
+    imports: [SubclassesModule],
+    controllers: [ClassesController],
+    providers: [ClassesService],
+    exports: [ClassesService],
 })
 export class ClassesModule {}
